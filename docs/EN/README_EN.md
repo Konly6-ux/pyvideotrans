@@ -1,313 +1,157 @@
-[简体中文](../../README.md) | English | [pt-BR](../pt-BR/README_pt-BR.md) | [Italian](../IT/README_IT.md) | [Spanish](../ES/README_ES.md)
-
----
-
-[👑Donate to this project](../about.md) | [Discord invitation link](https://discord.gg/y9gUweVCCJ)
-
----
-
 # Video Translation and Voiceover Tool
 
->
-> This is a video translation and voiceover tool that can translate videos from one language into a specified language, automatically generating and adding subtitles and voiceovers in that language.
->
-> Voice recognition supports `faster-whisper` model, `openai-whisper` model, and `GoogleSpeech`, `zh_recogn`Ali Chinese speech recognition model.
->
-> Text translation supports `Microsoft Translator|Google Translate|Baidu Translate|Tencent Translate|ChatGPT|AzureAI|Gemini|DeepL|DeepLX|Offline Translation OTT`
->
-> Text-to-speech synthesis supports `Microsoft Edge tts`, `Google tts`, `Azure AI TTS`, `Openai TTS`, `Elevenlabs TTS`, `Custom TTS server API`, `GPT-SoVITS`, [clone-voice](https://github.com/jianchang512/clone-voice), `[ChatTTS-ui](https://github.com/jianchang512/ChatTTS-ui)`  [Fish TTS](https://github.com/fishaudio/fish-speech) [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)
->
-> Allows for the retention of background accompaniment music, etc. (based on uvr5)
->
-> Supported languages: Simplified and Traditional Chinese, English, Korean, Japanese, Russian, French, German, Italian, Spanish, Portuguese, Vietnamese, Thai, Arabic, Turkish, Hungarian, Hindi, Ukrainian, Kazakh, Indonesian, Malay, Czech,Polish,Nl,sw
+This is a video translation and voiceover tool that can translate videos from one language into a specified language, automatically generating and adding subtitles and voiceovers in that language.
 
-# Main Uses and Methods of Use
+## Supported Features
 
-[Translate Video and Dubbing] Translate the audio in a video into another language's dubbing and embed the subtitles in that language.
+Voice recognition supports `faster-whisper` model, `openai-whisper` model, `OpenAI SpeechToText API`, `GoogleSpeech`, and `Ali Chinese speech recognition model`.
 
-[Audio or Video to Subtitles] Convert human speech in audio or video files into text and export as srt subtitle files.
+Text translation supports `Microsoft Translator|Google Translate|Baidu Translate|Tencent Translate|ChatGPT|AzureAI|Gemini|DeepL|DeepLX|Offline Translation OTT`.
 
-[Batch Subtitle Creation and Dubbing] Create dubbing based on existing local srt subtitle files, supporting both single and batch subtitles.
+Text-to-speech synthesis supports `Microsoft Edge tts`, `Google tts`, `Azure AI TTS`, `Openai TTS`, `Elevenlabs TTS`, `Custom TTS server API`, `GPT-SoVITS`, and other voice synthesis engines.
 
-[Batch Subtitle Translation] Translate one or more srt subtitle files into subtitles in other languages.
+Allows for the retention of background accompaniment music, etc. (based on uvr5).
 
-[Audio, Video, and Subtitles Merge] Merge audio files, video files, and subtitle files into one video file.
+Supported languages: Simplified and Traditional Chinese, English, Korean, Japanese, Russian, French, German, Italian, Spanish, Portuguese, Vietnamese, Thai, Arabic, Turkish, Hungarian, Hindi, Ukrainian, Kazakh, Indonesian, Malay, Czech, Polish, Dutch, Swedish, and other languages with automatic detection.
 
-[Extracting Audio from Video] Separate a video into audio files and silent video.
+## Main Uses and Functions
 
-[Download YouTube Videos] Download videos from YouTube.
+**[Translate Video and Dubbing]** Translate the audio in a video into another language's dubbing and embed the subtitles in that language.
 
-----
+**[Audio or Video to Subtitles]** Convert human speech in audio or video files into text and export as srt subtitle files.
 
-https://github.com/jianchang512/pyvideotrans/assets/3378335/3811217a-26c8-4084-ba24-7a95d2e13d58
+**[Subtitle Creation and Dubbing]** Create dubbing based on existing local srt subtitle files, supporting both single and batch subtitles.
 
+**[Subtitle Translation]** Translate one or more srt subtitle files into subtitles in other languages.
 
-# Pre-packaged Version (Only for win10/win11, MacOS/Linux use source code deployment)
+**[Merge Video and Audio]** Batch merge video files and audio files.
 
-> Packaged using pyinstaller, not made undetectable and unsigned, antivirus may alert, please add to the whitelist or deploy using the source code
+**[Merge Video and Subtitles]** Batch merge video files and srt subtitle files.
 
-0. [Click to download the pre-packaged version, unzip to an English directory without spaces, then double-click sp.exe](https://github.com/jianchang512/pyvideotrans/releases)
+**[Add Image Watermark to Video]** Batch embed image watermarks in video files.
 
-1. Unzip to an English path and make sure the path does not contain spaces. After unzipping, double-click sp.exe (If encountering permission issues, right-click to open as administrator)
+**[Extract Audio from Video]** Separate a video into audio files and silent video.
 
-4. Note: Must be used after unzipping, do not directly click inside the compressed package, and do not move the sp.exe file to other locations after unzipping.
+**[Audio/Video Format Conversion]** Batch convert audio and video formats.
 
+**[Edit Subtitles and Export Multiple Formats]** Support importing srt, vtt, ass format subtitles, editing and setting font styles, colors, etc., and exporting corresponding format subtitles.
 
-# MacOS Source Code Deployment
+**[Subtitle Format Conversion]** Batch convert subtitle files between srt/ass/vtt formats.
 
-0. Open a terminal window and execute the following commands one by one
+**[Download YouTube Videos]** Download videos from YouTube.
+
+**[Voice and Background Music Separation]**
+
+**[API Calls]** Support for voice synthesis, speech recognition, subtitle translation, and video translation interface calls.
+
+## MacOS Source Code Deployment
+
+0. Open a terminal window and execute the following commands one by one:
 
     > Make sure you have installed Homebrew before executing. If you have not installed Homebrew, you need to install it first.
     >
-    > Execute the command to install Homebrew: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+    > Execute the command to install Homebrew: `/bin/bash -c "$(curl -fsSL https://brew.sh/install.sh)"`
     >
     > After installation, execute: `eval $(brew --config)`
     >
 
     ```
     brew install libsndfile
-
     brew install ffmpeg
-
     brew install git
-
     brew install python@3.10
-
     ```
 
-    Continue executing
+    Continue executing:
 
     ```
     export PATH="/usr/local/opt/python@3.10/bin:$PATH"
-
     source ~/.bash_profile 
-	
-	source ~/.zshrc
-
+    source ~/.zshrc
     ```
-
 
 1. Create a folder without spaces or Chinese characters, then navigate to that folder in the terminal.
-2. In the terminal, execute `git clone https://github.com/jianchang512/pyvideotrans `
-3. Execute `cd pyvideotrans`
-4. Continue with `python -m venv venv`
-5. Execute `source ./venv/bin/activate` and ensure the terminal prompt begins with `(venv)`, following commands must ensure the terminal prompt starts with `(venv)`
-6. Execute `pip install -r requirements.txt`
+2. Download the source code and extract it to that folder.
+3. Execute `cd extracted_folder_name`.
+4. Continue with `python -m venv venv`.
+5. Execute `source ./venv/bin/activate` and ensure the terminal prompt begins with `(venv)`. The following commands must ensure the terminal prompt starts with `(venv)`.
+6. Execute `pip install -r requirements.txt`. If it fails, execute the following 2 commands to switch the pip mirror to Aliyun:
 
+    ```
+    pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+    pip config set install.trusted-host mirrors.aliyun.com
+    ```
 
-    Then re-execute. If failure still occurs after switching to the Aliyun source, try executing `pip install -r requirements.txt `
+    Then re-execute. If failure still occurs after switching to the Aliyun source, try executing `pip install -r requirements.txt`.
 
-7. `python sp.py` to open the software interface
+7. Run `python sp.py` to open the software interface.
 
+## Linux Source Code Deployment
 
-[Detailed Deployment Scheme for Mac](https://pyvideotrans.com/mac.html)
-
-# Linux Source Code Deployment
-
-0. For CentOS/RHEL series, execute the following commands in sequence to install python3.10
+0. For CentOS/RHEL series, execute the following commands in sequence to install python3.10:
 
 ```
-
 sudo yum update
-
 sudo yum groupinstall "Development Tools"
-
 sudo yum install openssl-devel bzip2-devel libffi-devel
-
 cd /tmp
-
 wget https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz
-
 tar xzf Python-3.10.4.tgz
-
 cd Python-3.10.4
-
 ./configure — enable-optimizations
-
 sudo make && sudo make install
-
 sudo alternatives — install /usr/bin/python3 python3 /usr/local/bin/python3.10 1
-
 sudo yum install -y ffmpeg
-
 ```
 
-1. For Ubuntu/Debian series, execute the following commands to install python3.10
+1. For Ubuntu/Debian series, execute the following commands to install python3.10:
 
 ```
-
 apt update && apt upgrade -y
-
 apt install software-properties-common -y
-
 add-apt-repository ppa:deadsnakes/ppa
-
 apt update
-
 sudo apt-get install libxcb-cursor0
-
 apt install python3.10
-
 curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
-
-<<<<<<< HEAD
-sudo update-alternatives --install /usr/bin/python python /usr/local/bin/python3.10  1
-=======
-
-sudo update-alternatives --install /usr/bin/python python /usr/local/bin/python3.10 
->>>>>>> 9485b1096d6a40a3fb6962a49df128397f10bdd5
-
+sudo update-alternatives --install /usr/bin/python python /usr/local/bin/python3.10 1
 sudo update-alternatives --config python
-
 apt-get install ffmpeg
-
 ```
 
+**Open any terminal and execute `python3 -V`. If the output is "3.10.4", it means the installation was successful; otherwise, it was not successful.**
 
-**Open any terminal and execute `python3 -V`, if the output is "3.10.4", it means the installation was successful; otherwise, it was not successful.**
-
-
-1. Create a folder without spaces or Chinese characters, then navigate to that folder from the terminal.
-3. In the terminal, execute `git clone https://github.com/jianchang512/pyvideotrans`
-4. Continue with `cd pyvideotrans`
-5. Execute `python -m venv venv`
-6. Continue with `source ./venv/bin/activate`, ensure the command line prompt has changed to start with `(venv)`, otherwise, it indicates an error.
-7. Execute `pip install -r requirements.txt`, if failure occurs, execute the following 2 commands to switch the pip mirror to Alibaba.
+2. Create a folder without spaces or Chinese characters, then navigate to that folder from the terminal.
+3. Download the source code and extract it to that folder.
+4. Execute `cd extracted_folder_name`.
+5. Execute `python -m venv venv`.
+6. Execute `source ./venv/bin/activate` and ensure the terminal prompt begins with `(venv)`. The following commands must ensure the terminal prompt starts with `(venv)`.
+7. Execute `pip install -r requirements.txt`. If it fails, execute the following 2 commands to switch the pip mirror to Aliyun:
 
     ```
-
     pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
     pip config set install.trusted-host mirrors.aliyun.com
-
     ```
 
-    Then re-execute. If failure still occurs after switching to the Aliyun source, try executing `pip install -r requirements.txt `
-8. To use CUDA acceleration, execute separately
+    Then re-execute. If failure still occurs after switching to the Aliyun source, try executing `pip install -r requirements.txt`.
 
-    `pip uninstall -y torch torchaudio`
-
-
-    `pip install torch==2.2.0 torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu118`
-
-    `pip install nvidia-cublas-cu11 nvidia-cudnn-cu11`
-
-9. To enable CUDA acceleration on Linux, an Nvidia graphics card must be available, and the CUDA11.8+ environment must be properly set up. Please search "Linux CUDA Installation" for more information.
-
-
-10. `python sp.py` to open the software interface
-
-
-# Window10/11 Source Code Deployment
-
-0. Open https://www.python.org/downloads/ to download Windows3.10, double-click to proceed with the installation, make sure to select "Add to PATH"
-
-   **Open a cmd, execute `python -V`, if the output is not `3.10.4`, it indicates an installation error or "Add to PATH" was not selected, please reinstall**
-
-1. Open https://github.com/git-for-windows/git/releases/download/v2.45.0.windows.1/Git-2.45.0-64-bit.exe, download Git, double-click and proceed with the installation steps.
-2. Find a folder without spaces or Chinese characters, enter `cmd` in the address bar and press enter to open the terminal, all the following commands must be executed in this terminal.
-3. Execute `git clone https://github.com/jianchang512/pyvideotrans`
-4. Continue with `cd pyvideotrans`
-5. Execute `python -m venv venv`
-6. Continue with `.\venv\scripts\activate`, after execution check and confirm that the command line has changed to start with `(venv)`, otherwise, it indicates an error.
-7. Execute `pip install -r requirements.txt `, if failure occurs, execute the following 2 commands to switch the pip mirror to Alibaba
+8. To use CUDA acceleration, execute separately:
 
     ```
-
-    pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
-    pip config set install.trusted-host mirrors.aliyun.com
-
+    pip uninstall -y torch torchaudio
+    pip install torch==2.2.0 torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu118
+    pip install nvidia-cublas-cu11 nvidia-cudnn-cu11
     ```
 
-    Then re-execute. If failure still occurs after switching to the Aliyun source, try executing `pip install -r requirements.txt`
-8.  To use CUDA acceleration, execute separately
+9. To enable CUDA acceleration on Linux, an Nvidia graphics card must be available, and the CUDA11.8+ environment must be properly set up.
 
-    `pip uninstall -y torch torchaudio`
+10. Run `python sp.py` to open the software interface.
 
-    `pip install torch==2.2.0 torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu118`
+## Main Dependencies
 
-
-9. For Windows, to enable CUDA acceleration, an Nvidia graphics card is required, and the CUDA11.8+ environment must be properly set up. See [CUDA Acceleration Support](https://pyvideotrans.com/gpu.html) for installation details.
-
-10. Unzip ffmpeg.zip to the current source code directory, prompt to overwrite if asked, make sure the ffmpeg folder under the source code directory contains ffmpeg.exe ffprobe.exe ytwin32.exe,
-
-11. `python sp.py` to open the software interface
-
-
-
-# Source Code Deployment Issue Explanation
-
-1. By default, ctranslate2 version 4.x is used, only supporting CUDA12.x version. If your CUDA version is below 12 and you cannot upgrade to CUDA12.x, please execute the command to uninstall ctranslate2 and then reinstall
-
-```
-
-pip uninstall -y ctranslate2
-
-pip install ctranslate2==3.24.0
-
-```
-
-2. You may encounter errors such as `xx module not found`. Open requirements.txt, search for the xx module, then remove the == and the version number after it.
-
-
-
-
-# User Guide and Documentation
-
-Please visit https://pyvideotrans.com/guide.html
-
-
-# Speech Recognition Models:
-
-   Download link: https://pyvideotrans.com/model.html
-
-   Model descriptions and differences: https://pyvideotrans.com/02.html
-
-
-
-# Video Tutorials (Third-party)
-
-[Mac Source Code Deployment/Bilibili](https://www.bilibili.com/video/BV1tK421y7rd/)
-
-[Method of setting video translation with Gemini Api/Bilibili](https://b23.tv/fED1dS3)
-
-[How to Download and Install](https://www.bilibili.com/video/BV1Gr421s7cN/)
-
-
-# Software Preview Screenshot
-
-![image](https://github.com/jianchang512/pyvideotrans/assets/3378335/c3abb561-1ab5-47f9-bfdc-609245445190)
-
-
-
-# Related Projects
-
-[OTT: Local Offline Text Translation Tool](https://github.com/jianchang512/ott)
-
-[Voice Clone Tool: Synthesizing Speech with Any Voice](https://github.com/jianchang512/clone-voice)
-
-[Speech Recognition Tool: Local Offline Speech-to-Text Tool](https://github.com/jianchang512/stt)
-
-[Vocal and Background Music Separation Tool](https://github.com/jianchang512/vocal-separate)
-
-[Improved version of api.py for GPT-SoVITS](https://github.com/jianchang512/gptsovits-api)
-
-[  CosyVoice   api.py](https://github.com/jianchang512/cosyvoice-api)
-
-## Acknowledgments
-
-> This program mainly relies on several open-source projects
-
-1. [ffmpeg](https://github.com/FFmpeg/FFmpeg)
-2. [PySide6](https://pypi.org/project/PySide6/)
-3. [edge-tts](https://github.com/rany2/edge-tts)
-4. [faster-whisper](https://github.com/SYSTRAN/faster-whisper)
-5. [openai-whisper](https://github.com/openai/whisper)
-6. [pydub](https://github.com/jiaaro/pydub)
-
-
-
-## Donate
-
-<img width="200" src="https://pyvideotrans.com/images/bianen.jpg">
-
-[https://ko-fi.com/jianchang512](https://ko-fi.com/jianchang512)
+1. ffmpeg
+2. PySide6
+3. edge-tts
+4. faster-whisper
+5. openai-whisper
+6. pydub
