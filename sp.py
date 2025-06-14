@@ -1,16 +1,3 @@
-"""
-
-pyVideoTrans: Translate the video from one language to another and add dubbing
-
-Home-page: https://github.com/jianchang512/pyvideotrans
-Author: jianchang512@gmail.com
-Documents: https://pyvideotrans.com
-License: GPL-V3
-
-# 代码是一坨屎，但又不是不能跑O(∩_∩)O~别在意那些细节
-# 写的这么烂，一看就不是AI写的
-
-"""
 import multiprocessing
 import sys, os
 import time
@@ -78,6 +65,11 @@ class StartWindow(QtWidgets.QWidget):
         with open('./videotrans/styles/style.qss', 'r', encoding='utf-8') as f:
             app.setStyleSheet(f.read())
         from videotrans.configure import config
+        
+        # 确保音频AI自动对齐队列已初始化
+        if not hasattr(config, 'audio_align_queue'):
+            config.audio_align_queue = []
+        
         try:
             from videotrans.mainwin._main_win import MainWindow
             sets=QSettings("pyvideotrans", "settings")
@@ -90,6 +82,10 @@ class StartWindow(QtWidgets.QWidget):
                 pass
             config.MAINWIN=MainWindow(width=w, height=h)
             config.MAINWIN.move(QPoint(int((self.width - w) / 2), int((self.height - h) / 2)))
+            
+            # 确保音频对齐功能已正确加载
+            self._ensure_audio_align_feature()
+            
         except Exception as e:
             import traceback
             from PySide6.QtWidgets import QMessageBox
@@ -101,6 +97,50 @@ class StartWindow(QtWidgets.QWidget):
 
         print(time.time())
         QTimer.singleShot(500, lambda :self.close())
+    
+    def _ensure_audio_align_feature(self):
+        """确保AI自动对齐功能被正确加载"""
+        from videotrans.configure import config
+        import logging
+        
+        try:
+            # 检查必要的库
+            try:
+                import librosa
+                import soundfile
+                config.logger.info("librosa和soundfile库已成功加载")
+            except ImportError as e:
+                config.logger.error(f"加载音频处理库失败: {str(e)}")
+                return
+            
+            # 确保音频对齐处理模块存在
+            try:
+                from videotrans.process.audio_align import AudioAligner
+                config.logger.info("AudioAligner模块已成功加载")
+            except ImportError as e:
+                config.logger.error(f"加载AudioAligner模块失败: {str(e)}")
+                return
+            
+            # 确保任务处理线程已启动
+            try:
+                from videotrans.task.job import WorkerAudioAlign
+                import threading
+                
+                for thread in threading.enumerate():
+                    if isinstance(thread, WorkerAudioAlign):
+                        config.logger.info("音频对齐线程已启动")
+                        return
+                
+                # 如果线程未启动，尝试启动
+                try:
+                    from videotrans.task.job import start_thread
+                    config.logger.info("启动音频对齐线程")
+                except Exception as e:
+                    config.logger.error(f"启动音频对齐线程失败: {str(e)}")
+            except Exception as e:
+                config.logger.error(f"检查音频对齐线程失败: {str(e)}")
+        except Exception as e:
+            config.logger.error(f"确保音频对齐功能时发生错误: {str(e)}")
 
     def center(self):
         screen = QGuiApplication.primaryScreen()
@@ -115,6 +155,9 @@ if __name__ == "__main__":
     except:
         pass
 
+    # 导入必要的库
+    import threading
+    
     app = QtWidgets.QApplication(sys.argv)
     startwin = None
     try:

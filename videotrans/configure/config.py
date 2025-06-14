@@ -61,31 +61,31 @@ MODELS_DOWNLOAD = {
         "large-v3-turbo": "https://openaipublic.azureedge.net/main/whisper/models/aff26ae408abcba5fbf8813c21e62b0941638c5f6eebfb145be0c9839262a19a/large-v3-turbo.pt",
     },
     "faster": {
-        "tiny": "https://github.com/jianchang512/stt/releases/download/0.0/faster-tiny.7z",
-        "tiny.en": "https://github.com/jianchang512/stt/releases/download/0.0/faster-tiny.en.7z",
-        "base": "https://github.com/jianchang512/stt/releases/download/0.0/faster-base.7z",
-        "base.en": "https://github.com/jianchang512/stt/releases/download/0.0/faster-base.en.7z",
+        "tiny": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/faster-tiny.7z?download=true",
+        "tiny.en": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/faster-tiny.en.7z?download=true",
+        "base": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/faster-base.7z?download=true",
+        "base.en": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/faster-base.en.7z?download=true",
 
-        "small": "https://github.com/jianchang512/stt/releases/download/0.0/faster-small.7z",
-        "small.en": "https://github.com/jianchang512/stt/releases/download/0.0/faster-small.en.7z",
+        "small": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/faster-small.7z?download=true",
+        "small.en": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/faster-small.en.7z?download=true",
 
-        "medium": "https://github.com/jianchang512/stt/releases/download/0.0/faster-medium.7z",
-        "medium.en": "https://github.com/jianchang512/stt/releases/download/0.0/faster-medium.en.7z",
+        "medium": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/faster-medium.7z?download=true",
+        "medium.en": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/faster-medium.en.7z?download=true",
 
         "large-v1": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/faster-large-v1.7z?download=true",
 
-        "large-v2": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/largev2-jieyao-dao-models.7z",
+        "large-v2": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/largev2-jieyao-dao-models.7z?download=true",
 
         "large-v3": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/faster-largev3.7z?download=true",
-        "large-v3-turbo": "https://github.com/jianchang512/stt/releases/download/0.0/faster-large-v3-turbo.7z",
+        "large-v3-turbo": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/faster-large-v3-turbo.7z?download=true",
 
-        "distil-whisper-small.en": "https://github.com/jianchang512/stt/releases/download/0.0/distil-whisper-small.en.7z",
+        "distil-whisper-small.en": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/distil-whisper-small.en.7z?download=true",
 
-        "distil-whisper-medium.en": "https://github.com/jianchang512/stt/releases/download/0.0/distil-whisper-medium.en.7z",
+        "distil-whisper-medium.en": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/distil-whisper-medium.en.7z?download=true",
 
-        "distil-whisper-large-v2": "https://github.com/jianchang512/stt/releases/download/0.0/distil-whisper-large-v2.7z",
+        "distil-whisper-large-v2": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/distil-whisper-large-v2.7z?download=true",
 
-        "distil-whisper-large-v3": "https://github.com/jianchang512/stt/releases/download/0.0/distil-whisper-large-v3.7z"
+        "distil-whisper-large-v3": "https://huggingface.co/spaces/mortimerme/s4/resolve/main/distil-whisper-large-v3.7z?download=true"
     }
 }
 
@@ -137,14 +137,8 @@ os.environ['HF_HUB_DISABLE_SYMLINKS_WARNING'] = 'true'
 
 
 # 语言
-env_lang = os.environ.get('PYVIDEOTRANS_LANG') # 新增：读取环境变量
-if env_lang: # 新增：如果环境变量存在，则使用它
-    defaulelang = env_lang
-else: # 原有逻辑
-    try:
-        defaulelang = locale.getdefaultlocale()[0][:2].lower()
-    except Exception:
-        defaulelang = "zh"
+# 强制设置为中文
+defaulelang = "zh"
 
 if defaulelang=='zh':
     os.environ['HF_ENDPOINT']='https://hf-mirror.com'
@@ -211,6 +205,8 @@ trans_queue = []
 dubb_queue = []
 # 音视频画面对齐
 align_queue = []
+# 音频AI自动对齐队列
+audio_align_queue = []
 # 合成队列
 assemb_queue = []
 
@@ -373,7 +369,8 @@ def parse_init():
         "chattts_voice": "11,12,16,2222,4444,6653,7869,9999,5,13,14,1111,3333,4099,5099,5555,8888,6666,7777",
         "google_trans_newadd": "",
         "proxy":"",
-        "refine3":False
+        "refine3":False,
+        "auto_align": False  # 新增AI自动对齐参数
         
     }
     if not os.path.exists(ROOT_DIR + "/videotrans/cfg.json"):        

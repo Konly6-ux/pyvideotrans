@@ -1,11 +1,20 @@
-import re
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Author: Amir Yazdani
+
+import os
+import time
 import shutil
+import traceback
+import json
+import uuid
 from pathlib import Path
 from typing import Dict
 
 from videotrans.configure import config
 from videotrans.configure._base import BaseCon
 from videotrans.util import tools
+from videotrans.util import set_process
 
 
 class BaseTask(BaseCon):
@@ -62,6 +71,70 @@ class BaseTask(BaseCon):
     # 根据 queue_tts 进行配音
     def dubbing(self):
         pass
+
+    # AI自动对齐配音和字幕
+    def audio_align(self):
+        """AI自动对齐配音和字幕"""
+        from videotrans.process.audio_align import AudioAligner
+        
+        if self._exit():
+            return
+        
+        self._signal(text=config.transobj.get('AI自动对齐中', 'AI Auto Aligning...'), type='update_process')
+        config.logger.info(f"开始执行任务{self.uuid}的AI自动对齐")
+        
+        try:
+            # 获取必要的文件路径
+            target_dir = self.cfg.get('target_dir')
+            novideo_mp4 = self.cfg.get('novideo_mp4')
+            target_mp3 = self.cfg.get('target_mp3')
+            target_srt = self.cfg.get('target_srt')
+            source_mp3 = self.cfg.get('source_mp3')
+            source_srt = self.cfg.get('source_srt')
+            target_language = config.params.get('target_language', 'en')
+            
+            config.logger.info(f"任务{self.uuid}的文件路径: target_mp3={target_mp3}, source_mp3={source_mp3}, target_srt={target_srt}, source_srt={source_srt}")
+            
+            # 检查必要文件是否存在
+            if not target_mp3 or not Path(target_mp3).exists():
+                error_msg = f"目标音频文件不存在: {target_mp3}"
+                config.logger.error(error_msg)
+                self._signal(text=error_msg, type='error')
+                return
+                
+            # 创建音频对齐器
+            aligner = AudioAligner()
+            config.logger.info(f"任务{self.uuid}的AudioAligner实例已创建")
+            
+            # 构建任务信息
+            task_info = {
+                "uuid": self.uuid,
+                "target_dir": target_dir,
+                "novideo_mp4": novideo_mp4,
+                "target_mp3": target_mp3,
+                "target_srt": target_srt,
+                "source_mp3": source_mp3,
+                "source_srt": source_srt,
+                "target_language": target_language
+            }
+            
+            # 处理音频对齐
+            config.logger.info(f"开始处理任务{self.uuid}的音频对齐")
+            success = aligner.process_video_with_alignment(task_info)
+            
+            if not success:
+                error_msg = config.transobj.get('AI自动对齐失败', 'AI Auto Align Failed')
+                config.logger.error(f"任务{self.uuid}的AI自动对齐失败")
+                self._signal(text=error_msg, type='error')
+            else:
+                config.logger.info(f"任务{self.uuid}的AI自动对齐成功完成")
+                
+            self._signal(text=config.transobj.get('AI自动对齐完成', 'AI Auto Align Complete'), type='update_process')
+            
+        except Exception as e:
+            error_msg = f"AI自动对齐异常: {str(e)}"
+            config.logger.exception(f"任务{self.uuid}的{error_msg}", exc_info=True)
+            self._signal(text=error_msg, type='error')
 
     # 配音加速、视频慢速对齐
     def align(self):

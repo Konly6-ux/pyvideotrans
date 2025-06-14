@@ -19,6 +19,7 @@ prepare_queue
 regcon_queue
 trans_queue
 dubb_queue
+audio_align_queue  # 新增AI自动对齐队列
 align_queue
 assemb_queue
 """
@@ -117,6 +118,7 @@ class WorkerTrans(Thread):
 class WorkerDubb(Thread):
     def __init__(self, *, parent=None):
         super().__init__()
+        self.name = "配音处理线程"  # 设置线程名称
 
     def run(self) -> None:
         while 1:
@@ -130,9 +132,62 @@ class WorkerDubb(Thread):
                 continue
             try:
                 trk.dubbing()
+                # 如果启用了AI自动对齐，则先进行音频对齐
+                is_auto_align = config.params.get('auto_align', False)
+                config.logger.info(f"任务{trk.uuid}配音完成，auto_align参数值: {is_auto_align}")
+                
+                if is_auto_align:
+                    config.logger.info(f"任务{trk.uuid}将进入AI自动对齐队列")
+                    # 确保audio_align_queue已初始化
+                    if not hasattr(config, 'audio_align_queue'):
+                        config.audio_align_queue = []
+                    config.audio_align_queue.append(trk)
+                else:
+                    config.logger.info(f"任务{trk.uuid}将跳过AI自动对齐，直接进入对齐队列")
+                    config.align_queue.append(trk)
+            except Exception as e:
+                msg = f'{config.transobj["peiyinchucuo"]}: {str(e)}'
+                config.logger.exception(e, exc_info=True)
+                set_process(text=msg, type='error', uuid=trk.uuid)
+
+
+class WorkerAudioAlign(Thread):
+    """AI自动对齐线程"""
+    def __init__(self, *, parent=None):
+        super().__init__()
+        config.logger.info("AI自动对齐线程已初始化")
+        self.name = "AI自动对齐线程"  # 设置线程名称
+
+    def run(self) -> None:
+        config.logger.info("AI自动对齐线程已启动")
+        while 1:
+            if config.exit_soft:
+                config.logger.info("AI自动对齐线程退出")
+                return
+            if len(config.audio_align_queue) < 1:
+                time.sleep(0.5)
+                continue
+                
+            config.logger.info(f"AI自动对齐队列中有{len(config.audio_align_queue)}个任务")
+            trk = config.audio_align_queue.pop(0)
+            
+            if task_is_stop(trk.uuid):
+                config.logger.info(f"任务{trk.uuid}已停止，跳过AI自动对齐")
+                continue
+                
+            try:
+                config.logger.info(f"开始处理任务{trk.uuid}的AI自动对齐")
+                # 检查auto_align参数是否已设置
+                is_auto_align = config.params.get('auto_align', False)
+                config.logger.info(f"auto_align参数值: {is_auto_align}")
+                
+                # 执行音频对齐
+                trk.audio_align()
+                
+                config.logger.info(f"任务{trk.uuid}的AI自动对齐处理完成")
                 config.align_queue.append(trk)
             except Exception as e:
-                msg = f'{config.transobj["peiyinchucuo"]}:' + str(e)
+                msg = f'AI自动对齐失败: {str(e)}'
                 config.logger.exception(e, exc_info=True)
                 set_process(text=msg, type='error', uuid=trk.uuid)
 
@@ -189,5 +244,6 @@ def start_thread(parent=None):
     WorkerRegcon(parent=parent).start()
     WorkerTrans(parent=parent).start()
     WorkerDubb(parent=parent).start()
+    WorkerAudioAlign(parent=parent).start()  # 新增AI自动对齐线程
     WorkerAlign(parent=parent).start()
     WorkerAssemb(parent=parent).start()

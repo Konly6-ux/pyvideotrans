@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import re
 import tempfile
 import time
@@ -23,18 +24,54 @@ def run(raws, err,detect, *, model_name, is_cuda, detect_language, audio_file, q
         except:
             pass
 
-    tmp_path =  Path(tempfile.gettempdir()+f'/recogn_{time.time()}')
+    # 添加详细的调试信息
+    write_log({"text": f"运行语音识别，平台: {os.name}, 系统: {sys.platform}", "type": "logs"})
+    write_log({"text": f"音频文件: {audio_file}, 模型: {model_name}", "type": "logs"})
+    
+    # 检查音频文件是否存在
+    if not Path(audio_file).exists():
+        err_msg = f"错误: 音频文件不存在: {audio_file}"
+        write_log({"text": err_msg, "type": "logs"})
+        err['msg'] = err_msg
+        return
+    
+    try:
+        # 检查音频文件格式
+        import wave
+        try:
+            with wave.open(audio_file, 'rb') as wf:
+                channels = wf.getnchannels()
+                sample_width = wf.getsampwidth()
+                frame_rate = wf.getframerate()
+                write_log({"text": f"音频信息: 通道数={channels}, 采样宽度={sample_width}, 采样率={frame_rate}", "type": "logs"})
+        except Exception as e:
+            write_log({"text": f"无法读取音频文件信息: {e}", "type": "logs"})
+    except ImportError:
+        write_log({"text": "wave模块导入失败", "type": "logs"})
+
+    tmp_path = Path(tempfile.gettempdir()+f'/recogn_{time.time()}')
     tmp_path.mkdir(parents=True, exist_ok=True)
     tmp_path = tmp_path.as_posix()
+    write_log({"text": f"临时目录: {tmp_path}", "type": "logs"})
 
     nonslient_file = f'{tmp_path}/detected_voice.json'
-    normalized_sound = AudioSegment.from_wav(audio_file)
+    try:
+        normalized_sound = AudioSegment.from_wav(audio_file)
+        write_log({"text": f"音频长度: {len(normalized_sound)}ms, 通道数: {normalized_sound.channels}, 采样率: {normalized_sound.frame_rate}", "type": "logs"})
+    except Exception as e:
+        err_msg = f"无法加载音频文件: {e}"
+        write_log({"text": err_msg, "type": "logs"})
+        err['msg'] = err_msg
+        return
+    
     if vail_file(nonslient_file):
         nonsilent_data = json.load(open(nonslient_file, 'r'))
     else:
         nonsilent_data = _shorten_voice_old(normalized_sound, settings)
         with open(nonslient_file, 'w') as f:
             f.write(json.dumps(nonsilent_data))
+    
+    write_log({"text": f"分段数量: {len(nonsilent_data)}", "type": "logs"})
 
     total_length = len(nonsilent_data)
 
@@ -104,7 +141,7 @@ def run(raws, err,detect, *, model_name, is_cuda, detect_language, audio_file, q
 
             text = re.sub(r'&#\d+;', '', text.replace('&#39;', "'")).strip()
 
-            if not text or re.match(r'^[，。、？‘’“”；：（｛｝【】）:;"\'\s \d`!@#$%^&*()_+=.,?/\\-]*$', text):
+            if not text or re.match(r"^[^a-zA-Z]*$", text):
                 continue
 
             if detect['langcode'][:2] == 'zh' and settings['zh_hant_s']:
@@ -154,3 +191,4 @@ def _shorten_voice_old(normalized_sound, settings):
             start_time=i*max_interval
         nonsilent_data.append((start_time, end_time, False))
     return nonsilent_data
+
