@@ -4,7 +4,7 @@ import threading
 from pathlib import Path
 import os
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 
 from PySide6.QtGui import QTextCursor
 from PySide6.QtWidgets import QMessageBox, QFileDialog
@@ -725,12 +725,26 @@ class WinAction(WinActionSub):
         tools.set_process(text='start', type='create_btns')
 
     def click_subtitle(self):
-        # 删除跳转功能
-        pass
+        """点击字幕区域时的响应"""
+        if hasattr(self.main, 'subtitle_area'):
+            # 高亮显示字幕区域
+            self.main.subtitle_area.setStyleSheet("QPlainTextEdit { border: 2px solid #2ECC71; }")
+            QTimer.singleShot(500, lambda: self.main.subtitle_area.setStyleSheet(""))
+            
+            # 设置焦点到字幕区域
+            self.main.subtitle_area.setFocus()
 
     def click_translate_type(self):
-        # 删除跳转功能
-        pass
+        """点击翻译设置区域时的响应"""
+        if hasattr(self.main, 'translation_group'):
+            # 高亮显示翻译设置区域
+            self.main.translation_group.setStyleSheet("QGroupBox { border: 2px solid #2ECC71; }")
+            QTimer.singleShot(500, lambda: self.main.translation_group.setStyleSheet(""))
+            
+            # 设置焦点到翻译类型下拉框
+            if hasattr(self.main, 'translate_type'):
+                self.main.translate_type.setFocus()
+                self.main.translate_type.showPopup()  # 显示下拉菜单
 
     def click_tts_type(self):
         # 删除跳转功能

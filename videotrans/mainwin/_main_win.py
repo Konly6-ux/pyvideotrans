@@ -168,94 +168,42 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except Exception as e:
             print(e)
 
-
-    # 设置各种默认值和设置文字 提示等
-    def _set_cache_set(self):
-        if platform.system() == 'Darwin':
-            self.enable_cuda.setChecked(False)
-            self.enable_cuda.hide()
-        self.source_mp4.setAcceptDrops(True)
-
-        self.stop_djs.setStyleSheet("""background-color:#148CD2;color:#ffffff""")
-        self.proxy.setText(config.proxy)
-        self.continue_compos.setToolTip(config.transobj['Click to start the next step immediately'])
-        self.split_type.addItems([config.transobj['whisper_type_all'], config.transobj['whisper_type_avg']])
-
-        self.subtitle_type.addItems(
-            [
-                config.transobj['nosubtitle'],
-                config.transobj['embedsubtitle'],
-                config.transobj['softsubtitle'],
-                config.transobj['embedsubtitle2'],
-                config.transobj['softsubtitle2']
-            ])
-        self.subtitle_type.setCurrentIndex(config.params['subtitle_type'])
-
-        if config.params['recogn_type'] > 1:
-            self.model_name_help.setVisible(False)
-        else:
-            self.model_name_help.clicked.connect(self.win_action.show_model_help)
-
-        try:
-            config.params['tts_type'] = int(config.params['tts_type'])
-        except Exception:
-            config.params['tts_type'] = 0
-
-        if config.params['split_type']:
-            d = {"all": 0, "avg": 1}
-            self.split_type.setCurrentIndex(d[config.params['split_type']])
-
-        if config.params['subtitle_type'] and int(config.params['subtitle_type']) > 0:
-            self.subtitle_type.setCurrentIndex(int(config.params['subtitle_type']))
-
-        try:
-            self.voice_rate.setValue(int(config.params['voice_rate'].replace('%', '')))
-        except Exception:
-            self.voice_rate.setValue(0)
-        try:
-            self.pitch_rate.setValue(int(config.params['pitch'].replace('Hz', '')))
-            self.volume_rate.setValue(int(config.params['volume']))
-        except Exception:
-            self.pitch_rate.setValue(0)
-            self.volume_rate.setValue(0)
-        self.addbackbtn.clicked.connect(self.win_action.get_background)
-
-        self.split_type.setDisabled(True if config.params['recogn_type'] > 0 else False)
-        self.voice_autorate.setChecked(bool(config.params['voice_autorate']))
-        self.video_autorate.setChecked(bool(config.params['video_autorate']))
-        self.append_video.setChecked(bool(config.params['append_video']))
-        self.clear_cache.setChecked(bool(config.params.get('clear_cache')))
-        self.enable_cuda.setChecked(True if config.params['cuda'] else False)
-        self.only_video.setChecked(True if config.params['only_video'] else False)
-        self.is_separate.setChecked(True if config.params['is_separate'] else False)
-        self.rephrase.setChecked(config.settings.get('rephrase'))
-        self.remove_noise.setChecked(config.params.get('remove_noise'))
-        self.copysrt_rawvideo.setChecked(config.params.get('copysrt_rawvideo',False))
-        self.auto_align.setChecked(config.params.get('auto_align',False))
-
-        self.bgmvolume.setText(str(config.settings.get('backaudio_volume',0.8)))
-        self.is_loop_bgm.setChecked(bool(config.settings.get('loop_backaudio',True)))
-
-        self.enable_cuda.toggled.connect(self.win_action.check_cuda)
-        self.tts_type.currentIndexChanged.connect(self.win_action.tts_type_change)
+        # 绑定翻译和语言相关控件
         self.translate_type.currentIndexChanged.connect(self.win_action.set_translate_type)
-        self.voice_role.currentTextChanged.connect(self.win_action.show_listen_btn)
+        self.source_language.currentIndexChanged.connect(self.win_action.source_language_change)
         self.target_language.currentTextChanged.connect(self.win_action.set_voice_role)
-        self.source_language.currentTextChanged.connect(self.win_action.source_language_change)
 
+        # 绑定TTS和语音相关控件
+        self.tts_type.currentIndexChanged.connect(self.win_action.tts_type_change)
+        self.voice_role.currentTextChanged.connect(self.win_action.show_listen_btn)
 
+        # 绑定识别相关控件
+        self.recogn_type.currentIndexChanged.connect(self.win_action.recogn_type_change)
+        self.model_name.currentTextChanged.connect(self.win_action.check_model_name)
+        self.split_type.currentIndexChanged.connect(self.win_action.check_split_type)
+
+        # 绑定功能区域点击事件
+        if hasattr(self, 'recognition_group'):
+            self.recognition_group.mousePressEvent = lambda event: self.win_action.click_reglabel()
+        
+        if hasattr(self, 'dubbing_group'):
+            self.dubbing_group.mousePressEvent = lambda event: self.win_action.click_tts_type()
+            
+        if hasattr(self, 'translation_group'):
+            self.translation_group.mousePressEvent = lambda event: self.win_action.click_translate_type()
+            
+        if hasattr(self, 'subtitle_area'):
+            self.subtitle_area.mousePressEvent = lambda event: self.win_action.click_subtitle()
+
+        # 绑定其他按钮和控件
         self.proxy.textChanged.connect(self.win_action.change_proxy)
         self.import_sub.clicked.connect(self.win_action.import_sub_fun)
-
         self.startbtn.clicked.connect(self.win_action.check_start)
         self.btn_save_dir.clicked.connect(self.win_action.get_save_dir)
         self.btn_get_video.clicked.connect(self.win_action.get_mp4)
         self.stop_djs.clicked.connect(self.win_action.reset_timeid)
         self.continue_compos.clicked.connect(self.win_action.set_djs_timeout)
         self.listen_btn.clicked.connect(self.win_action.listen_voice_fun)
-        self.split_type.currentIndexChanged.connect(self.win_action.check_split_type)
-        self.model_name.currentTextChanged.connect(self.win_action.check_model_name)
-        self.recogn_type.currentIndexChanged.connect(self.win_action.recogn_type_change)
         
         # 删除所有点击文字跳转界面的功能
         from videotrans.util import tools
@@ -337,3 +285,72 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_videoandaudio.triggered.connect(self.win_action.set_videoandaudio)
         
         Path(config.TEMP_DIR+'/stop_process.txt').unlink(missing_ok=True)
+
+    # 设置各种默认值和设置文字 提示等
+    def _set_cache_set(self):
+        if platform.system() == 'Darwin':
+            self.enable_cuda.setChecked(False)
+            self.enable_cuda.hide()
+        self.source_mp4.setAcceptDrops(True)
+
+        self.stop_djs.setStyleSheet("""background-color:#148CD2;color:#ffffff""")
+        self.proxy.setText(config.proxy)
+        self.continue_compos.setToolTip(config.transobj['Click to start the next step immediately'])
+        self.split_type.addItems([config.transobj['whisper_type_all'], config.transobj['whisper_type_avg']])
+
+        self.subtitle_type.addItems(
+            [
+                config.transobj['nosubtitle'],
+                config.transobj['embedsubtitle'],
+                config.transobj['softsubtitle'],
+                config.transobj['embedsubtitle2'],
+                config.transobj['softsubtitle2']
+            ])
+        self.subtitle_type.setCurrentIndex(config.params['subtitle_type'])
+
+        if config.params['recogn_type'] > 1:
+            self.model_name_help.setVisible(False)
+        else:
+            self.model_name_help.clicked.connect(self.win_action.show_model_help)
+
+        try:
+            config.params['tts_type'] = int(config.params['tts_type'])
+        except Exception:
+            config.params['tts_type'] = 0
+
+        if config.params['split_type']:
+            d = {"all": 0, "avg": 1}
+            self.split_type.setCurrentIndex(d[config.params['split_type']])
+
+        if config.params['subtitle_type'] and int(config.params['subtitle_type']) > 0:
+            self.subtitle_type.setCurrentIndex(int(config.params['subtitle_type']))
+
+        try:
+            self.voice_rate.setValue(int(config.params['voice_rate'].replace('%', '')))
+        except Exception:
+            self.voice_rate.setValue(0)
+        try:
+            self.pitch_rate.setValue(int(config.params['pitch'].replace('Hz', '')))
+            self.volume_rate.setValue(int(config.params['volume']))
+        except Exception:
+            self.pitch_rate.setValue(0)
+            self.volume_rate.setValue(0)
+        self.addbackbtn.clicked.connect(self.win_action.get_background)
+
+        self.split_type.setDisabled(True if config.params['recogn_type'] > 0 else False)
+        self.voice_autorate.setChecked(bool(config.params['voice_autorate']))
+        self.video_autorate.setChecked(bool(config.params['video_autorate']))
+        self.append_video.setChecked(bool(config.params['append_video']))
+        self.clear_cache.setChecked(bool(config.params.get('clear_cache')))
+        self.enable_cuda.setChecked(True if config.params['cuda'] else False)
+        self.only_video.setChecked(True if config.params['only_video'] else False)
+        self.is_separate.setChecked(True if config.params['is_separate'] else False)
+        self.rephrase.setChecked(config.settings.get('rephrase'))
+        self.remove_noise.setChecked(config.params.get('remove_noise'))
+        self.copysrt_rawvideo.setChecked(config.params.get('copysrt_rawvideo',False))
+        self.auto_align.setChecked(config.params.get('auto_align',False))
+
+        self.bgmvolume.setText(str(config.settings.get('backaudio_volume',0.8)))
+        self.is_loop_bgm.setChecked(bool(config.settings.get('loop_backaudio',True)))
+
+        self.enable_cuda.toggled.connect(self.win_action.check_cuda)

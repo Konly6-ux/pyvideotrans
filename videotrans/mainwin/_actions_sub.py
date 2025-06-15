@@ -268,74 +268,58 @@ class WinActionSub:
     # 设置为字幕创建配音模式
     def set_peiyin(self):
         self.main.action_peiyin.setChecked(True)
-        self.main.splitter.setSizes([self.main.width-300, 300])
         self.main.app_mode = 'peiyin'
-        self.main.show_tips.setText("为字幕文件创建配音" if config.defaulelang=='zh' else "Create dubbing for subtitle files")
-        self.main.startbtn.setText(config.transobj['kaishichuli'])
         self.main.action_biaozhun.setChecked(False)
         self.main.action_tiquzimu.setChecked(False)
         self.main.action_fanyisrt.setChecked(False)
         self.main.action_vas.setChecked(False)
         self.main.action_videoandaudio.setChecked(False)
-        
-        # 打开字幕配音窗口
+
         def open_peiyin_win():
             from videotrans.winform import fn_peiyin
             fn_peiyin.openwin()
         QTimer.singleShot(50, open_peiyin_win)
-    
+
     # 设置字幕翻译模式
     def set_fanyisrt(self):
         self.main.action_fanyisrt.setChecked(True)
-        self.main.splitter.setSizes([self.main.width-300, 300])
         self.main.app_mode = 'fanyisrt'
-        self.main.show_tips.setText("翻译字幕文件" if config.defaulelang=='zh' else "Translate subtitle files")
-        self.main.startbtn.setText(config.transobj['kaishichuli'])
         self.main.action_biaozhun.setChecked(False)
         self.main.action_tiquzimu.setChecked(False)
         self.main.action_peiyin.setChecked(False)
         self.main.action_vas.setChecked(False)
         self.main.action_videoandaudio.setChecked(False)
-        
-        # 打开字幕翻译窗口
+
         def open_fanyisrt_win():
             from videotrans.winform import fn_fanyisrt
             fn_fanyisrt.openwin()
         QTimer.singleShot(50, open_fanyisrt_win)
-    
+
     # 设置视频音频合并模式
     def set_vas(self):
         self.main.action_vas.setChecked(True)
-        self.main.splitter.setSizes([self.main.width-300, 300])
         self.main.app_mode = 'vas'
-        self.main.show_tips.setText("视频音频合并" if config.defaulelang=='zh' else "Merge video and audio")
-        self.main.startbtn.setText(config.transobj['kaishichuli'])
         self.main.action_biaozhun.setChecked(False)
         self.main.action_tiquzimu.setChecked(False)
         self.main.action_peiyin.setChecked(False)
         self.main.action_fanyisrt.setChecked(False)
         self.main.action_videoandaudio.setChecked(False)
-        
-        # 打开视频音频合并窗口
+
         def open_vas_win():
             from videotrans.winform import fn_vas
             fn_vas.openwin()
         QTimer.singleShot(50, open_vas_win)
-    
+
     # 设置视频字幕合并模式
     def set_videoandaudio(self):
         self.main.action_videoandaudio.setChecked(True)
-        self.main.splitter.setSizes([self.main.width-300, 300])
         self.main.app_mode = 'videoandaudio'
-        self.main.show_tips.setText("视频字幕合并" if config.defaulelang=='zh' else "Merge video and subtitle")
-        self.main.startbtn.setText(config.transobj['kaishichuli'])
         self.main.action_biaozhun.setChecked(False)
         self.main.action_tiquzimu.setChecked(False)
         self.main.action_peiyin.setChecked(False)
         self.main.action_fanyisrt.setChecked(False)
         self.main.action_vas.setChecked(False)
-        
-        # 打开视频字幕合并窗口
+
         def open_videoandaudio_win():
             from videotrans.winform import fn_videoandsrt
             fn_videoandsrt.openwin()
