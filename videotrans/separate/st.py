@@ -1,6 +1,9 @@
 import hashlib
 import os
 import traceback
+import requests
+import py7zr
+import shutil
 from pathlib import Path
 
 import librosa
@@ -13,9 +16,82 @@ from videotrans.configure import config
 from videotrans.separate.vr import AudioPre
 
 
+def download_uvr5_model():
+    """下载UVR5模型文件"""
+    model_dir = Path(config.ROOT_DIR) / "uvr5_weights"
+    model_file = model_dir / "HP2.pth"
+    model_params = model_dir / "modelparams" / "2band_44100_lofi.json"
+    
+    # 如果模型文件已存在，则不需要下载
+    if model_file.exists() and model_params.exists():
+        return True
+        
+    # 创建必要的目录
+    model_dir.mkdir(parents=True, exist_ok=True)
+    (model_dir / "modelparams").mkdir(parents=True, exist_ok=True)
+    (model_dir / "models").mkdir(parents=True, exist_ok=True)
+    
+    # 下载模型文件
+    url = "https://github.com/jianchang512/stt/releases/download/0.0/uvr5-model.7z"
+    temp_file = Path(config.TEMP_DIR) / "uvr5-model.7z"
+    temp_extract_dir = Path(config.TEMP_DIR) / "uvr5_extract"
+    
+    try:
+        print(f"正在下载UVR5模型文件，请稍候...")
+        response = requests.get(url, stream=True)
+        total_size = int(response.headers.get('content-length', 0))
+        
+        with open(temp_file, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+        
+        # 先解压到临时目录
+        print(f"正在解压UVR5模型文件...")
+        # 确保临时解压目录存在并为空
+        if temp_extract_dir.exists():
+            shutil.rmtree(temp_extract_dir)
+        temp_extract_dir.mkdir(parents=True, exist_ok=True)
+        
+        with py7zr.SevenZipFile(temp_file, mode='r') as z:
+            z.extractall(path=temp_extract_dir)
+        
+        # 移动文件到正确的位置
+        extracted_model_dir = temp_extract_dir / "uvr5_weights"
+        if extracted_model_dir.exists():
+            # 复制所有.pth文件到模型目录
+            for pth_file in extracted_model_dir.glob("*.pth"):
+                shutil.copy2(pth_file, model_dir)
+            
+            # 复制modelparams目录下的文件
+            extracted_params_dir = extracted_model_dir / "modelparams"
+            if extracted_params_dir.exists():
+                for param_file in extracted_params_dir.glob("*"):
+                    shutil.copy2(param_file, model_dir / "modelparams")
+        
+        # 删除临时文件和目录
+        temp_file.unlink(missing_ok=True)
+        if temp_extract_dir.exists():
+            shutil.rmtree(temp_extract_dir)
+            
+        return True
+    except Exception as e:
+        print(f"下载UVR5模型文件失败: {str(e)}")
+        return False
+
+
 def uvr(*, model_name=None, save_root=None, inp_path=None, source="logs", uuid=None, percent=[0, 1]):
     infos = []
     try:
+        # 检查模型文件是否存在，如果不存在则下载
+        model_file = Path(config.ROOT_DIR) / "uvr5_weights" / f"{model_name}.pth"
+        if not model_file.exists():
+            download_success = download_uvr5_model()
+            if not download_success:
+                infos.append("模型文件下载失败，请手动下载UVR5模型文件")
+                yield "\n".join(infos)
+                return
+        
         func = AudioPre
         pre_fun = func(
             agg=10,

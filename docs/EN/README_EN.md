@@ -67,7 +67,7 @@ Supported languages: Simplified and Traditional Chinese, English, Korean, Japane
     ```
     export PATH="/usr/local/opt/python@3.10/bin:$PATH"
     source ~/.bash_profile 
-    source ~/.zshrc
+	source ~/.zshrc
     ```
 
 1. Create a folder without spaces or Chinese characters, then navigate to that folder in the terminal.

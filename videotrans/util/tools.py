@@ -1652,29 +1652,8 @@ def remove_qsettings_data():
 
 
 def open_url(url=None, title: str = None):
-    import webbrowser
-    if url:
-        return webbrowser.open_new_tab(url)
-    title_url_dict = {
-        'blog': "https://bbs.pyvideotrans.com",
-        'ffmpeg': "https://www.ffmpeg.org/download.html",
-        'git': "https://github.com/jianchang512/pyvideotrans",
-        'issue': "https://github.com/jianchang512/pyvideotrans/issues",
-        'discord': "https://discord.gg/7ZWbwKGMcx",
-        'models': "https://github.com/jianchang512/stt/releases/tag/0.0",
-        'stt': "https://github.com/jianchang512/stt/",
-
-        'gtrans': "https://pvt9.com/aiocr",
-        'cuda': "https://pvt9.com/gpu.html",
-        'website': "https://pvt9.com",
-        'help': "https://pvt9.com",
-        'xinshou': "https://pvt9.com/getstart",
-        "about": "https://pvt9.com/about",
-        'download': "https://github.com/jianchang512/pyvideotrans/releases",
-        'openvoice': "https://github.com/kungful/openvoice-api"
-    }
-    if title and title in title_url_dict:
-        return webbrowser.open_new_tab(title_url_dict[title])
+    # 删除URL跳转功能
+    pass
 
 
 def open_dir(dirname=None):
@@ -2263,7 +2242,7 @@ def clean_srt(srt):
     srt = re.sub(r'([：:])\s*', ':', srt)
     # ,， 换成 ,
     srt = re.sub(r'([,，])\s*', ',', srt)
-    srt = re.sub(r'([`’\'\"])\s*', '', srt)
+    srt = re.sub(r'([`\'\'\"])\s*', '', srt)
 
     # 秒和毫秒间的.换成,
     srt = re.sub(r'(:\d+)\.\s*?(\d+)', r'\1,\2', srt)
@@ -2355,54 +2334,8 @@ def format_milliseconds(milliseconds):
 
 
 def show_glossary_editor(parent):
-    from PySide6.QtWidgets import (QVBoxLayout, QTextEdit, QDialog,
-                                   QDialogButtonBox)
-    from PySide6.QtCore import Qt
-    """
-    弹出一个窗口，包含一个文本框和保存按钮，并处理文本的读取和保存。
-
-    Args:
-        parent: 父窗口 (QWidget)
-    """
-    dialog = QDialog(parent)
-    dialog.setWindowTitle("在此填写术语对照表，格式： 术语=翻译" if config.defaulelang == 'zh' else '')
-    dialog.setMinimumSize(600, 400)
-
-    layout = QVBoxLayout(dialog)
-
-    text_edit = QTextEdit()
-    text_edit.setPlaceholderText(
-        "请按照 术语=翻译 的格式，一行一组来填写，例如\n\n首席执行官=CEO\n人工智能=AI\n\n在原文中如果遇到以上左侧文字，则翻译结果使用右侧文字" if config.defaulelang == 'zh' else "Please fill in one line at a time, following the term on the left and the translation on the right, e.g. \nBallistic Missile Defense=BMD\nChief Executive Officer=CEO")
-    layout.addWidget(text_edit)
-
-    button_box = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
-    layout.addWidget(button_box)
-
-    # 读取文件内容，并设置为文本框默认值
-    file_path = config.ROOT_DIR + "/videotrans/glossary.txt"
-    try:
-        if os.path.exists(file_path):
-            with open(file_path, "r", encoding="utf-8") as f:
-                content = f.read()
-                text_edit.setText(content)
-    except Exception as e:
-        print(f"读取文件失败: {e}")
-
-    def save_text():
-        """
-        点击保存按钮，将文本框内容写回文件。
-        """
-        try:
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write(text_edit.toPlainText())  # toPlainText 获取纯文本
-            dialog.accept()
-        except Exception as e:
-            print(f"写入文件失败: {e}")
-
-    button_box.accepted.connect(save_text)
-    button_box.rejected.connect(dialog.reject)
-    dialog.setWindowModality(Qt.WindowModality.ApplicationModal)  # 设置模态窗口
-    dialog.exec()  # 显示模态窗口
+    # 删除术语表编辑器功能
+    pass
 
 
 def is_writable(directory_path: str):

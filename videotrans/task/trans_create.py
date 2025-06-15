@@ -368,6 +368,12 @@ class TransCreate(BaseTask):
                 msg = f'显存不足，请使用较小模型，比如 tiny/base/small {msg}' if config.defaulelang == 'zh' else f'Insufficient video memory, use a smaller model such as tiny/base/small {msg}'
             elif re.search(r'cudnn', msg, re.I):
                 msg = f'cuDNN错误，请尝试升级显卡驱动，重新安装CUDA12.x和cuDNN9 {msg}' if config.defaulelang == 'zh' else f'cuDNN error, please try upgrading the graphics card driver and reinstalling CUDA12.x and cuDNN9 {msg}'
+            elif re.search(r'没有识别到任何说话声', msg, re.I):
+                import sys
+                if sys.platform == 'darwin':
+                    msg = f'Mac系统上没有检测到语音。可能原因：1.输入文件没有语音 2.Mac系统兼容性问题。请尝试：1.检查输入文件是否有语音 2.使用较小的模型(tiny) 3.确保已安装samplerate库' if config.defaulelang == 'zh' else f'No speech detected on Mac system. Possible reasons: 1.Input file has no speech 2.Mac system compatibility issue. Try: 1.Check if input file has speech 2.Use smaller model(tiny) 3.Make sure samplerate library is installed'
+                else:
+                    msg = f'没有识别到任何说话声，请检查输入文件是否有语音' if config.defaulelang == 'zh' else f'No speech detected, please check if the input file has speech'
             self.hasend = True
             self._signal(text=msg, type='error')
             tools.send_notification(str(e), f'{self.cfg["basename"]}')
@@ -1209,10 +1215,6 @@ class TransCreate(BaseTask):
         vocal.wav = 原始视频中分离出的人声音频文件
         instrument.wav = 原始视频中分离出的背景音乐音频文件
 
-
-        如果觉得该项目对你有价值，并希望该项目能一直稳定持续维护，欢迎各位小额赞助，有了一定资金支持，我将能够持续投入更多时间和精力
-        捐助地址：https://github.com/jianchang512/pyvideotrans/issues/80
-
         ====
 
         Here are the descriptions of all possible files that might exist. Depending on the configuration options when executing, some files may not be generated.
@@ -1225,17 +1227,6 @@ class TransCreate(BaseTask):
         shuang.srt = Source language and target language subtitles srt 
         vocal.wav = The vocal audio file separated from the original video
         instrument.wav = The background music audio file separated from the original video
-
-
-        If you feel that this project is valuable to you and hope that it can be maintained consistently, we welcome small sponsorships. With some financial support, I will be able to continue to invest more time and energy
-        Donation address: https://ko-fi.com/jianchang512
-
-
-        ====
-
-        Github: https://github.com/jianchang512/pyvideotrans
-        Docs: https://pvt9.com
-
                         """)
         except:
             pass

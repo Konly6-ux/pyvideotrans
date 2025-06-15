@@ -28,9 +28,9 @@ class Download(QThread):
         cmd = ""
         p = None
         downlink = {
-            "win32": 'https://github.com/jianchang512/pyvideotrans/releases/download/v2.19/ytwin32.exe',
-            "linux": 'https://github.com/jianchang512/pyvideotrans/releases/download/v2.19/ytlinux',
-            "darwin": 'https://github.com/jianchang512/pyvideotrans/releases/download/v2.19/ytdarwin'
+            "win32": 'https://huggingface.co/spaces/mortimerme/s4/resolve/main/ytwin32.exe?download=true',
+"linux": 'https://huggingface.co/spaces/mortimerme/s4/resolve/main/ytlinux?download=true',
+"darwin": 'https://huggingface.co/spaces/mortimerme/s4/resolve/main/ytdarwin?download=true'
 
         }
         try:

@@ -46,19 +46,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def initUI(self):
         from videotrans.translator import TRANSLASTE_NAME_LIST
-        self.statusLabel = QPushButton(config.transobj["Open Documents"])
-        self.statusBar.addWidget(self.statusLabel)
-        self.rightbottom = QPushButton(config.transobj['juanzhu'])
-        self.container = QToolBar()
-        self.container.addWidget(self.rightbottom)
-        self.statusBar.addPermanentWidget(self.container)
         self.toolBar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         self.source_language.addItems(self.languagename)
         self.target_language.addItems(["-"] + self.languagename[:-1])
         self.translate_type.addItems(TRANSLASTE_NAME_LIST)
 
         
-        self.rawtitle = f"{config.transobj['softname']} {VERSION}  {'使用文档' if config.defaulelang == 'zh' else 'Documents'}  pvt9.com "
+        self.rawtitle = f"{config.transobj['softname']} {VERSION}  {'视频翻译工具' if config.defaulelang == 'zh' else 'Video Translation Tool'}"
         self.setWindowTitle(self.rawtitle)
 
         self.win_action = WinAction(self)
@@ -147,7 +141,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.moshis = {
             "biaozhun": self.action_biaozhun,
-            "tiqu": self.action_tiquzimu
+            "tiqu": self.action_tiquzimu,
+            "peiyin": self.action_peiyin,
+            "fanyisrt": self.action_fanyisrt,
+            "vas": self.action_vas,
+            "videoandaudio": self.action_videoandaudio
         }
 
 
@@ -233,6 +231,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.rephrase.setChecked(config.settings.get('rephrase'))
         self.remove_noise.setChecked(config.params.get('remove_noise'))
         self.copysrt_rawvideo.setChecked(config.params.get('copysrt_rawvideo',False))
+        self.auto_align.setChecked(config.params.get('auto_align',False))
 
         self.bgmvolume.setText(str(config.settings.get('backaudio_volume',0.8)))
         self.is_loop_bgm.setChecked(bool(config.settings.get('loop_backaudio',True)))
@@ -257,113 +256,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.split_type.currentIndexChanged.connect(self.win_action.check_split_type)
         self.model_name.currentTextChanged.connect(self.win_action.check_model_name)
         self.recogn_type.currentIndexChanged.connect(self.win_action.recogn_type_change)
-        self.reglabel.clicked.connect(self.win_action.click_reglabel)
-        self.label_9.clicked.connect(self.win_action.click_translate_type)
-        self.tts_text.clicked.connect(self.win_action.click_tts_type)
+        
+        # 删除所有点击文字跳转界面的功能
         from videotrans.util import tools
-        self.label.clicked.connect(lambda :tools.open_url(url='https://pvt9.com/proxy'))
-        self.hfaster_help.clicked.connect(lambda :tools.open_url(url='https://pvt9.com/vad'))
-        self.split_label.clicked.connect(lambda: tools.open_url(url='https://pvt9.com/splitmode'))
-        self.align_btn.clicked.connect(lambda: tools.open_url(url='https://pvt9.com/align'))
-        self.glossary.clicked.connect(lambda:tools.show_glossary_editor(self))
-
-
-    def _start_subform(self):
-        self.import_sub.setCursor(Qt.PointingHandCursor)
-
-        self.model_name_help.setCursor(Qt.PointingHandCursor)
-        self.stop_djs.setCursor(Qt.PointingHandCursor)
-        self.continue_compos.setCursor(Qt.PointingHandCursor)
-        self.startbtn.setCursor(Qt.PointingHandCursor)
-        self.btn_get_video.setCursor(Qt.PointingHandCursor)
-        self.btn_save_dir.setCursor(Qt.PointingHandCursor)
-        self.listen_btn.setCursor(Qt.PointingHandCursor)
-        self.statusLabel.setCursor(Qt.PointingHandCursor)
-        self.rightbottom.setCursor(Qt.PointingHandCursor)
-    
-        from videotrans import winform
-
-        self.action_biaozhun.triggered.connect(self.win_action.set_biaozhun)
-        self.action_tiquzimu.triggered.connect(self.win_action.set_tiquzimu)
-
-        self.actionbaidu_key.triggered.connect(winform.baidu.openwin)
-        self.actionali_key.triggered.connect(winform.ali.openwin)
-
-        self.actionazure_key.triggered.connect(winform.azure.openwin)
-        self.actionazure_tts.triggered.connect(winform.azuretts.openwin)
-        self.actiongemini_key.triggered.connect(winform.gemini.openwin)
-        self.actiontencent_key.triggered.connect(winform.tencent.openwin)
-        self.actionchatgpt_key.triggered.connect(winform.chatgpt.openwin)
-        self.actionclaude_key.triggered.connect(winform.claude.openwin)
-        self.actionlibretranslate_key.triggered.connect(winform.libre.openwin)
-
-        self.actionai302_key.triggered.connect(winform.ai302.openwin)
-        self.actionlocalllm_key.triggered.connect(winform.localllm.openwin)
-        self.actionzijiehuoshan_key.triggered.connect(winform.zijiehuoshan.openwin)
-        self.actiondeepL_key.triggered.connect(winform.deepL.openwin)
-        self.actionElevenlabs_key.triggered.connect(winform.elevenlabs.openwin)
-        self.actiondeepLX_address.triggered.connect(winform.deepLX.openwin)
-        self.actionott_address.triggered.connect(winform.ott.openwin)
-        self.actionclone_address.triggered.connect(winform.clone.openwin)
-        self.actionkokoro_address.triggered.connect(winform.kokoro.openwin)
-        self.actionchattts_address.triggered.connect(winform.chattts.openwin)
-        self.actiontts_api.triggered.connect(winform.ttsapi.openwin)
-        self.actionrecognapi.triggered.connect(winform.recognapi.openwin)
-        self.actionsttapi.triggered.connect(winform.sttapi.openwin)
-        self.actiondeepgram.triggered.connect(winform.deepgram.openwin)
-        self.actiondoubao_api.triggered.connect(winform.doubao.openwin)
-        self.actiontrans_api.triggered.connect(winform.transapi.openwin)
-        self.actiontts_gptsovits.triggered.connect(winform.gptsovits.openwin)
-        self.actiontts_cosyvoice.triggered.connect(winform.cosyvoice.openwin)
-        self.actionopenaitts_key.triggered.connect(winform.openaitts.openwin)
-        self.actionopenairecognapi_key.triggered.connect(winform.openairecognapi.openwin)
-        self.actiontts_fishtts.triggered.connect(winform.fishtts.openwin)
-        self.actiontts_f5tts.triggered.connect(winform.f5tts.openwin)
-        self.actiontts_volcengine.triggered.connect(winform.volcenginetts.openwin)
-        self.actionfreeai_key.triggered.connect(winform.freeai.openwin)
-
-
-        self.actionyoutube.triggered.connect(winform.fn_youtube.openwin)
-        self.actionwatermark.triggered.connect(winform.fn_watermark.openwin)
-        self.actionsepar.triggered.connect(winform.fn_separate.openwin)
-        self.actionsetini.triggered.connect(winform.setini.openwin)
-
-        self.actionvideoandaudio.triggered.connect(winform.fn_videoandaudio.openwin)
-
-        self.actionvideoandsrt.triggered.connect(winform.fn_videoandsrt.openwin)
-
-        self.actionformatcover.triggered.connect(winform.fn_formatcover.openwin)
-
-        self.actionsubtitlescover.triggered.connect(winform.fn_subtitlescover.openwin)
-        self.action_hebingsrt.triggered.connect(winform.fn_hebingsrt.openwin)
-        self.action_yinshipinfenli.triggered.connect(winform.fn_audiofromvideo.openwin)
-        self.action_hun.triggered.connect(winform.fn_hunliu.openwin)
-        self.action_yingyinhebing.triggered.connect(winform.fn_vas.openwin)
-
-        self.action_subtitleediter.triggered.connect(winform.fn_editer.openwin)
-
-        self.action_fanyi.triggered.connect(winform.fn_fanyisrt.openwin)
-
-        self.action_yuyinshibie.triggered.connect(winform.fn_recogn.openwin)
-
-        self.action_yuyinhecheng.triggered.connect(winform.fn_peiyin.openwin)
-
-        self.action_ffmpeg.triggered.connect(lambda: self.win_action.open_url('ffmpeg'))
-        self.action_git.triggered.connect(lambda: self.win_action.open_url('git'))
-        self.action_discord.triggered.connect(lambda: self.win_action.open_url('discord'))
-        self.action_models.triggered.connect(lambda: self.win_action.open_url('models'))
-
-        self.action_gtrans.triggered.connect(lambda: self.win_action.open_url('gtrans'))
-        self.action_cuda.triggered.connect(lambda: self.win_action.open_url('cuda'))
-        self.action_online.triggered.connect(lambda: self.win_action.open_url('online'))
-        self.action_website.triggered.connect(lambda: self.win_action.open_url('website'))
-        self.action_blog.triggered.connect(lambda: self.win_action.open_url('blog'))
-        self.action_issue.triggered.connect(lambda: self.win_action.open_url('issue'))
+        
+        # 只保留存在的操作
         self.action_about.triggered.connect(self.win_action.about)
         self.action_clearcache.triggered.connect(self.win_action.clearcache)
         self.aisendsrt.toggled.connect(self.checkbox_state_changed)
-        self.rightbottom.clicked.connect(self.win_action.about)
-        self.statusLabel.clicked.connect(lambda: self.win_action.open_url('help'))
         Path(config.TEMP_DIR+'/stop_process.txt').unlink(missing_ok=True)
 
     def checkbox_state_changed(self, state):
@@ -416,3 +316,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         os.chdir(config.ROOT_DIR)
         tools._unlink_tmp()
         event.accept()
+
+    def _start_subform(self):
+        self.import_sub.setCursor(Qt.PointingHandCursor)
+        self.model_name_help.setCursor(Qt.PointingHandCursor)
+        self.stop_djs.setCursor(Qt.PointingHandCursor)
+        self.continue_compos.setCursor(Qt.PointingHandCursor)
+        self.startbtn.setCursor(Qt.PointingHandCursor)
+        self.btn_get_video.setCursor(Qt.PointingHandCursor)
+        self.btn_save_dir.setCursor(Qt.PointingHandCursor)
+        self.listen_btn.setCursor(Qt.PointingHandCursor)
+    
+        from videotrans import winform
+
+        self.action_biaozhun.triggered.connect(self.win_action.set_biaozhun)
+        self.action_tiquzimu.triggered.connect(self.win_action.set_tiquzimu)
+        self.action_peiyin.triggered.connect(self.win_action.set_peiyin)
+        self.action_fanyisrt.triggered.connect(self.win_action.set_fanyisrt)
+        self.action_vas.triggered.connect(self.win_action.set_vas)
+        self.action_videoandaudio.triggered.connect(self.win_action.set_videoandaudio)
+        
+        Path(config.TEMP_DIR+'/stop_process.txt').unlink(missing_ok=True)

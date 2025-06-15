@@ -246,10 +246,8 @@ class WinAction(WinActionSub):
     # 判断 语音参数 vad参数区域是否应该可见
     # 仅当是 faster并且 是整体识别
     def click_reglabel(self):
-        if self.main.recogn_type.currentIndex() == recognition.FASTER_WHISPER and self.main.split_type.currentIndex() == 0:
-            self.hide_show_element(self.main.hfaster_layout, not self.main.threshold.isVisible())
-        else:
-            self.hide_show_element(self.main.hfaster_layout, False)
+        # 删除跳转功能
+        pass
 
     # 是否属于 配音角色 随所选目标语言变化的配音渠道 是 edgeTTS AzureTTS 或 302.ai同时 ai302tts_model=azure
     def change_by_lang(self, type):
@@ -689,6 +687,7 @@ class WinAction(WinActionSub):
             self.cfg['app_mode'] = self.main.app_mode
 
         self.cfg['remove_noise'] = self.main.remove_noise.isChecked()
+        self.cfg['auto_align'] = self.main.auto_align.isChecked()
         config.params.update(self.cfg)
         config.getset_params(config.params)
         self.delete_process()
@@ -726,38 +725,16 @@ class WinAction(WinActionSub):
         tools.set_process(text='start', type='create_btns')
 
     def click_subtitle(self):
-        from videotrans.component.set_subtitles_length import SubtitleSettingsDialog
-        dialog = SubtitleSettingsDialog(self.main, config.settings.get('cjk_len', 24),
-                                        config.settings.get('other_len', 66))
-        if dialog.exec():  # OK 按钮被点击时 exec 返回 True
-            cjk_value, other_value = dialog.get_values()
-            config.settings['cjk_len'] = cjk_value
-            config.settings['other_len'] = other_value
-            with  open(config.ROOT_DIR + "/videotrans/cfg.json", 'w', encoding='utf-8') as f:
-                f.write(json.dumps(config.settings, ensure_ascii=False))
+        # 删除跳转功能
+        pass
 
     def click_translate_type(self):
-        from videotrans.component.set_threads import SetThreadTransDubb
-        dialog = SetThreadTransDubb(name='trans', nums=config.settings.get('trans_thread', 5),
-                                    sec=config.settings.get('translation_wait', 0),ai_nums=config.settings.get('aitrans_thread', 500))
-        if dialog.exec():  # OK 按钮被点击时 exec 返回 True
-            num, wait,ainums = dialog.get_values()
-            config.settings['trans_thread'] = num
-            config.settings['aitrans_thread'] = ainums
-            config.settings['translation_wait'] = wait
-            with  open(config.ROOT_DIR + "/videotrans/cfg.json", 'w', encoding='utf-8') as f:
-                f.write(json.dumps(config.settings, ensure_ascii=False))
+        # 删除跳转功能
+        pass
 
     def click_tts_type(self):
-        from videotrans.component.set_threads import SetThreadTransDubb
-        dialog = SetThreadTransDubb(name='dubbing', nums=config.settings.get('dubbing_thread', 5),
-                                    sec=config.settings.get('dubbing_wait', 0))
-        if dialog.exec():  # OK 按钮被点击时 exec 返回 True
-            num, wait = dialog.get_values()
-            config.settings['dubbing_thread'] = num
-            config.settings['dubbing_wait'] = wait
-            with  open(config.ROOT_DIR + "/videotrans/cfg.json", 'w', encoding='utf-8') as f:
-                f.write(json.dumps(config.settings, ensure_ascii=False))
+        # 删除跳转功能
+        pass
 
     def create_btns(self):
         target_dir = Path(self.main.target_dir if self.main.target_dir else Path(
