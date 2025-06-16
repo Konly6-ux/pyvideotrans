@@ -132,7 +132,6 @@ QComboBox::drop-down {
 QComboBox::down-arrow {
     width: 12px;
     height: 12px;
-    image: url(videotrans/styles/icons/down_arrow_dark.png);
 }
 
 QComboBox QAbstractItemView {
@@ -175,7 +174,6 @@ QCheckBox::indicator:unchecked {
 
 QCheckBox::indicator:checked {
     background-color: #0071e3;
-    image: url(videotrans/styles/icons/check_white.png);
 }
 
 QCheckBox::indicator:hover {

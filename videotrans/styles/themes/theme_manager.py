@@ -9,9 +9,7 @@ class ThemeManager:
     THEMES = {
         "dark": "暗黑主题 (Dark)",
         "light": "明亮主题 (Light)",
-        "apple": "苹果风格 (Apple)",
-        "minimal": "极简主题 (Minimal)",
-        "classic": "经典主题 (Classic)"
+        "apple": "苹果风格 (Apple)"
     }
     
     def __init__(self, root_dir):

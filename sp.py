@@ -1,7 +1,6 @@
 import multiprocessing
 import sys, os
 import time
-import argparse # 新增导入
 
 from PySide6 import QtWidgets
 from PySide6.QtCore import Qt, QTimer, QPoint, QSettings, QSize
@@ -12,15 +11,6 @@ from videotrans import VERSION
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 os.environ["OMP_NUM_THREADS"] = str(os.cpu_count())
-
-# 新增：解析命令行参数
-parser = argparse.ArgumentParser()
-parser.add_argument('--lang', type=str, help='Set the application language (e.g., en, zh)')
-cli_args, unknown = parser.parse_known_args() # 使用 parse_known_args 以避免与 PySide6 参数冲突
-
-if cli_args.lang:
-    os.environ['PYVIDEOTRANS_LANG'] = cli_args.lang.lower()
-
 
 class StartWindow(QtWidgets.QWidget):
     def __init__(self):
@@ -38,8 +28,6 @@ class StartWindow(QtWidgets.QWidget):
         self.label.setGeometry(self.rect()) #直接设置几何形状覆盖
 
         self.setWindowIcon(QIcon("./videotrans/styles/icon.ico"))
-        
-        
         
         v1 = QtWidgets.QVBoxLayout()
         v1.addStretch(1)
@@ -62,9 +50,29 @@ class StartWindow(QtWidgets.QWidget):
         # 创建并显示窗口B
         print(time.time())
         import videotrans.ui.dark.darkstyle_rc
-        with open('./videotrans/styles/style.qss', 'r', encoding='utf-8') as f:
-            app.setStyleSheet(f.read())
+        
+        # 加载配置
         from videotrans.configure import config
+        
+        # 设置样式表
+        try:
+            # 使用主题系统
+            from videotrans.styles.themes.theme_manager import ThemeManager
+            theme_manager = ThemeManager(config.ROOT_DIR)
+            
+            # 加载当前主题样式
+            style_sheet = theme_manager.get_theme_style()
+            app.setStyleSheet(style_sheet)
+        except Exception as e:
+            import traceback
+            print(f"加载主题时出错: {e}")
+            print(traceback.format_exc())
+            # 出错时使用默认样式
+            try:
+                with open('./videotrans/styles/style.qss', 'r', encoding='utf-8') as f:
+                    app.setStyleSheet(f.read())
+            except:
+                pass
         
         # 确保音频AI自动对齐队列已初始化
         if not hasattr(config, 'audio_align_queue'):

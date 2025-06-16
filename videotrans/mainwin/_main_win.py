@@ -5,14 +5,17 @@ import time,os
 
 
 from PySide6.QtCore import Qt, QTimer, QSettings, QEvent
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QMainWindow, QPushButton, QToolBar
+from PySide6.QtGui import QIcon, QAction
+from PySide6.QtWidgets import QMainWindow, QPushButton, QToolBar, QMenu, QWidget
 
 
 from videotrans.configure import config
 
 
 from videotrans.ui.en import Ui_MainWindow
+from videotrans.ui.three_column_layout import ThreeColumnLayout
+from videotrans.ui.theme_selector import ThemeSelector
+from videotrans.styles.themes.theme_manager import ThemeManager
 from videotrans.util import tools
 from videotrans.mainwin._actions import WinAction
 from videotrans import VERSION, recognition
@@ -37,12 +40,93 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowIcon(QIcon(f"{config.ROOT_DIR}/videotrans/styles/icon.ico"))
 
         self.languagename = config.langnamelist
+        
+        # 初始化主题管理器
+        self.theme_manager = ThemeManager(config.ROOT_DIR)
+        
+        # 设置原始UI
         self.setupUi(self)
+        
+        # 初始化UI数据
         self.initUI()
+        
+        # 应用当前主题
+        self.apply_current_theme()
+        
+        # 应用三栏布局
+        QTimer.singleShot(100, self.apply_three_column_layout)
+        
         self.show()
-        QTimer.singleShot(50, self._set_cache_set)
-        QTimer.singleShot(100, self._start_subform)
+        QTimer.singleShot(200, self._set_cache_set)
+        QTimer.singleShot(300, self._start_subform)
         QTimer.singleShot(500, self._bindsignal)
+
+    def apply_three_column_layout(self):
+        """应用三栏布局"""
+        try:
+            self.three_column_layout = ThreeColumnLayout()
+            self.three_column_layout.setupUi(self, self)
+            
+            # 连接主题选择动作信号
+            self.three_column_layout.action_theme.triggered.connect(self.show_theme_selector)
+        except Exception as e:
+            import traceback
+            print(f"应用三栏布局时出错: {e}")
+            print(traceback.format_exc())
+            
+            # 出错时添加主题菜单到原始UI
+            self.add_theme_menu_to_original_ui()
+        
+    def add_theme_menu_to_original_ui(self):
+        """在原始UI上添加主题菜单"""
+        try:
+            # 创建主题菜单
+            self.menu_theme = QMenu(self.menubar)
+            self.menu_theme.setObjectName("menu_theme")
+            self.menu_theme.setTitle("主题 / Theme")
+            
+            # 添加主题菜单到菜单栏
+            self.menubar.addAction(self.menu_theme.menuAction())
+            
+            # 创建主题选择动作
+            self.action_theme = QAction(self)
+            self.action_theme.setObjectName("action_theme")
+            self.action_theme.setText("选择主题 / Select Theme")
+            self.action_theme.triggered.connect(self.show_theme_selector)
+            
+            # 添加主题选择动作到主题菜单
+            self.menu_theme.addAction(self.action_theme)
+        except Exception as e:
+            print(f"添加主题菜单时出错: {e}")
+        
+    def apply_current_theme(self):
+        """应用当前主题"""
+        try:
+            style_sheet = self.theme_manager.get_theme_style()
+            self.setStyleSheet(style_sheet)
+        except Exception as e:
+            print(f"应用主题时出错: {e}")
+        
+    def show_theme_selector(self):
+        """显示主题选择器对话框"""
+        try:
+            theme_selector = ThemeSelector(self.theme_manager, self)
+            theme_selector.themeChanged.connect(self.on_theme_changed)
+            theme_selector.exec()
+        except Exception as e:
+            print(f"显示主题选择器时出错: {e}")
+        
+    def on_theme_changed(self, theme_id):
+        """当主题改变时的处理函数
+        
+        Args:
+            theme_id: 主题ID
+        """
+        try:
+            style_sheet = self.theme_manager.get_theme_style(theme_id)
+            self.setStyleSheet(style_sheet)
+        except Exception as e:
+            print(f"更改主题时出错: {e}")
 
     def initUI(self):
         from videotrans.translator import TRANSLASTE_NAME_LIST
@@ -148,7 +232,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "videoandaudio": self.action_videoandaudio
         }
 
-
+        # 如果使用经典UI，则添加主题菜单
+        if os.environ.get('PYVIDEOTRANS_CLASSIC_UI') == '1':
+            self.add_theme_menu_to_original_ui()
 
     def _bindsignal(self):
         try:
