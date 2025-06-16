@@ -274,12 +274,12 @@ class WinActionSub:
         self.main.action_fanyisrt.setChecked(False)
         self.main.action_vas.setChecked(False)
         self.main.action_videoandaudio.setChecked(False)
-
+        
         def open_peiyin_win():
             from videotrans.winform import fn_peiyin
             fn_peiyin.openwin()
         QTimer.singleShot(50, open_peiyin_win)
-
+    
     # 设置字幕翻译模式
     def set_fanyisrt(self):
         self.main.action_fanyisrt.setChecked(True)
@@ -289,12 +289,12 @@ class WinActionSub:
         self.main.action_peiyin.setChecked(False)
         self.main.action_vas.setChecked(False)
         self.main.action_videoandaudio.setChecked(False)
-
+        
         def open_fanyisrt_win():
             from videotrans.winform import fn_fanyisrt
             fn_fanyisrt.openwin()
         QTimer.singleShot(50, open_fanyisrt_win)
-
+    
     # 设置视频音频合并模式
     def set_vas(self):
         self.main.action_vas.setChecked(True)
@@ -304,12 +304,12 @@ class WinActionSub:
         self.main.action_peiyin.setChecked(False)
         self.main.action_fanyisrt.setChecked(False)
         self.main.action_videoandaudio.setChecked(False)
-
+        
         def open_vas_win():
             from videotrans.winform import fn_vas
             fn_vas.openwin()
         QTimer.singleShot(50, open_vas_win)
-
+    
     # 设置视频字幕合并模式
     def set_videoandaudio(self):
         self.main.action_videoandaudio.setChecked(True)
@@ -319,7 +319,7 @@ class WinActionSub:
         self.main.action_peiyin.setChecked(False)
         self.main.action_fanyisrt.setChecked(False)
         self.main.action_vas.setChecked(False)
-
+        
         def open_videoandaudio_win():
             from videotrans.winform import fn_videoandsrt
             fn_videoandsrt.openwin()
